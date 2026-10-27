@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Kayra AI Assistant</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_chat">Chat</string>
+    <string name="tab_mic">Voice Orb</string>
+    <string name="tab_tools">Tools (14)</string>
+    <string name="tab_settings">Settings</string>
+    <string name="customize_ui_title">Customize My UI Studio</string>
+    <string name="pin_lock_title">Security PIN Lock</string>
+    <string name="private_vault_title">Private Notes &amp; Parking Vault</string>
+    <string name="replay_greeting">Replay Voice Greeting</string>
+    <string name="export_apk_html">Download index.html / Copy Code for APK</string>
+</resources>

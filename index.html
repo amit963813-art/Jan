@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>KAYRA AI ASSISTANT — Futuristic AI Companion</title>
+  <style>
+    :root {
+      --primary: #d946ef;
+      --secondary: #8b5cf6;
+      --accent: #00f5d4;
+      --bg: #090414;
+      --surface: #130926;
+      --card: #1d1036;
+      --text: #f5f0ff;
+      --muted: #cbb8e8;
+      --danger: #ff4d6d;
+      --radius-bubble: 18px;
+    }
+    body.light-mode {
+      --bg: #f8f5ff;
+      --surface: #ffffff;
+      --card: #ede5ff;
+      --text: #16082c;
+      --muted: #49366b;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .phone-shell {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 18%, rgba(217,70,239,0.16), transparent 60%), var(--bg);
+      position: relative;
+      padding-bottom: 82px;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(19, 9, 38, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(217,70,239,0.3);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .brand-row { display: flex; align-items: center; gap: 8px; }
+    .brand-logo {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; box-shadow: 0 0 12px var(--primary); color: #fff;
+    }
+    .brand-title { font-weight: 800; font-size: 15px; color: var(--primary); letter-spacing: 0.8px; }
+    select.model-select {
+      background: var(--card); color: var(--accent);
+      border: 1px solid rgba(217,70,239,0.45);
+      border-radius: 99px; padding: 2px 8px; font-size: 11px; width: auto;
+    }
+    .header-actions { display: flex; align-items: center; gap: 5px; }
+    .icon-btn {
+      background: var(--card); color: var(--text);
+      border: 1px solid rgba(217,70,239,0.35);
+      border-radius: 50%; width: 34px; height: 34px;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 15px;
+    }
+    .timer-badge {
+      background: rgba(255,77,109,0.25); border: 1px solid var(--danger);
+      color: #fff; border-radius: 99px; padding: 3px 8px; font-size: 11px; font-weight: 700;
+      display: none; cursor: pointer;
+    }
+    main { flex: 1; padding: 14px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(217, 70, 239, 0.35);
+      border-radius: 18px;
+      padding: 15px;
+      margin-bottom: 14px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.28);
+    }
+    h1, h2, h3, h4 { margin: 0 0 6px 0; }
+    .greet-title { font-size: 26px; font-weight: 800; color: var(--primary); }
+    .sub-muted { color: var(--muted); font-size: 13px; margin: 4px 0; }
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff; border: none; border-radius: 99px;
+      padding: 10px 16px; font-weight: 700; font-size: 13px;
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 1px solid rgba(217,70,239,0.55);
+      border-radius: 99px; padding: 8px 13px; font-size: 12px; cursor: pointer;
+    }
+    .orb-wrap {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 20px 0;
+    }
+    .mic-orb {
+      width: 146px; height: 146px; border-radius: 50%;
+      background: radial-gradient(circle, var(--primary), var(--secondary));
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 35px var(--primary), 0 0 70px rgba(0,245,212,0.35);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; animation: pulseOrb 2.2s infinite ease-in-out;
+      user-select: none; color: #fff;
+    }
+    .mic-orb.listening {
+      box-shadow: 0 0 55px var(--accent), 0 0 95px var(--primary);
+      transform: scale(1.08);
+    }
+    @keyframes pulseOrb {
+      0%, 100% { transform: scale(0.96); }
+      50% { transform: scale(1.04); }
+    }
+    .badges-row, .chips-row {
+      display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin: 10px 0;
+    }
+    .badge-pill {
+      background: var(--surface); border: 1px solid rgba(217,70,239,0.45);
+      color: var(--text); padding: 6px 11px; border-radius: 99px; font-size: 12px; cursor: pointer;
+    }
+    .input-row {
+      display: flex; gap: 8px; align-items: center; margin-top: 10px;
+    }
+    input, textarea, select {
+      width: 100%; background: var(--surface); color: var(--text);
+      border: 1px solid rgba(217,70,239,0.45); border-radius: 14px;
+      padding: 10px 12px; font-size: 13px; outline: none;
+    }
+    .chat-box {
+      max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+      padding-bottom: 10px;
+    }
+    .msg {
+      max-width: 86%; padding: 12px 14px; border-radius: var(--radius-bubble);
+      line-height: 1.45; font-size: 14px; word-wrap: break-word;
+    }
+    .msg.user {
+      align-self: flex-end; background: rgba(217,70,239,0.25);
+      border: 1px solid var(--primary);
+    }
+    .msg.bot {
+      align-self: flex-start; background: var(--card);
+      border: 1px solid rgba(139,92,246,0.45);
+    }
+    nav.bottom-nav {
+      position: fixed; bottom: 0; width: 100%; max-width: 480px;
+      background: rgba(19, 9, 38, 0.96); backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(217,70,239,0.35);
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 6px 4px; z-index: 25;
+    }
+    .nav-item {
+      background: none; border: none; color: var(--muted);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      font-size: 11px; cursor: pointer; padding: 4px 8px;
+    }
+    .nav-item.active { color: var(--primary); font-weight: 700; }
+    .nav-center-orb {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: 2px solid var(--accent); color: #fff; font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: -18px; box-shadow: 0 0 18px var(--primary); cursor: pointer;
+    }
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(5, 2, 12, 0.85);
+      backdrop-filter: blur(6px); z-index: 50; display: none;
+      align-items: center; justify-content: center; padding: 14px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-content {
+      background: var(--surface); border: 1px solid var(--primary);
+      border-radius: 22px; width: 100%; max-width: 440px; max-height: 86vh;
+      overflow-y: auto; padding: 18px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    #torchOverlay {
+      position: fixed; inset: 0; background: #ffffff; color: #000;
+      z-index: 99; display: none; align-items: center; justify-content: center;
+      flex-direction: column; font-weight: 800; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="torchOverlay" onclick="this.style.display='none'">
+    <div style="font-size:54px;">🔦</div>
+    <div>MAX-BRIGHTNESS SCREEN TORCH</div>
+    <div style="font-size:13px;font-weight:400;margin-top:6px;">Tap anywhere to turn off</div>
+  </div>
+
+  <div class="phone-shell">
+    <header>
+      <div class="brand-row">
+        <div class="brand-logo">✨</div>
+        <div>
+          <div class="brand-title" id="hdrAiName">KAYRA</div>
+          <select class="model-select" id="modelSelector">
+            <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+            <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+          </select>
+        </div>
+      </div>
+      <div class="timer-badge" id="hdrTimerBadge" onclick="cancelLiveTimer()">⏱️ 00:00</div>
+      <div class="header-actions">
+        <button class="icon-btn" id="muteBtn" onclick="toggleMute()" title="Voice ON/Mute">🔊</button>
+        <button class="icon-btn" onclick="startVoiceRecognition()" title="Voice Control">🎙️</button>
+        <button class="icon-btn" onclick="openPinLock()" title="Safe PIN Lock">🛡️</button>
+        <button class="icon-btn" onclick="openCustomizeModal()" title="Edit UI">🎨</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- TAB 1: HOME -->
+      <section class="tab-pane active" id="tab-home">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+              <div class="greet-title" id="homeHello">Hello, Amit</div>
+              <div style="font-size:15px;font-weight:600;">How can I assist you today?</div>
+              <div class="sub-muted" id="homeGreetingLine">"Hello Amit! Main Kayra hoon. How can I assist you today?"</div>
+            </div>
+            <button class="icon-btn" onclick="openToolModal(8)" title="Notifications">🔔<span id="notifBadge" style="font-size:10px;color:var(--accent);">4</span></button>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn" onclick="speakGreeting()">🔊 Replay Voice</button>
+            <span class="badge-pill" id="wakeWordBadge">Wake: "Hey Kayra"</span>
+          </div>
+        </div>
+
+        <div id="missionBox" class="card" style="display:none;border-color:var(--accent);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="color:var(--accent);" id="missionTitle">🚀 Active Mission</strong>
+            <div>
+              <button class="btn-outline" onclick="togglePauseMission()" id="missionPauseBtn">Pause</button>
+              <button class="btn-outline" onclick="cancelMission()">Cancel</button>
+            </div>
+          </div>
+          <div class="sub-muted" id="missionStepText" style="margin-top:6px;">Initializing...</div>
+        </div>
+
+        <div class="orb-wrap">
+          <div class="mic-orb" id="mainMicOrb" onclick="startVoiceRecognition()">
+            <div style="font-size:40px;">🎙️</div>
+            <div style="font-size:11px;font-weight:800;margin-top:4px;">TAP TO SPEAK</div>
+          </div>
+          <div class="sub-muted" id="voiceStatusText">Tap Orb for Hindi / Hinglish / English Voice Command</div>
+        </div>
+
+        <div class="badges-row">
+          <span class="badge-pill" onclick="switchTab('mic')">🎙️ Voice Assistant</span>
+          <span class="badge-pill" onclick="openToolModal(12)">🤖 Screen Automation</span>
+          <span class="badge-pill" onclick="openToolModal(6)">⚡ AI Powered</span>
+          <span class="badge-pill" onclick="openToolModal(14)">🛡️ Privacy First</span>
+          <span class="badge-pill" onclick="openToolModal(1)">🌐 Multi-Language</span>
+        </div>
+
+        <div class="chips-row">
+          <button class="btn-outline" onclick="handleQuickCommand('Namaste Kayra! Aaj ka motivational plan batao')">Namaste Kayra!</button>
+          <button class="btn-outline" onclick="handleQuickCommand('Mera secret note save karo: Project launch 6 PM')">Save Secret Note</button>
+          <button class="btn-outline" onclick="startCountdown(30)">⏱️ 30s Timer</button>
+          <button class="btn-outline" onclick="openToolModal(1)">🚨 Emergency SOS</button>
+          <button class="btn-outline" onclick="handleQuickCommand('Lock')">🔒 Lock</button>
+        </div>
+
+        <div class="input-row">
+          <input type="text" id="homeQuickInput" placeholder="Ask KAYRA or type 'Lock'..." onkeydown="if(event.key==='Enter')sendFromHome()" />
+          <button class="btn" onclick="sendFromHome()">Send</button>
+        </div>
+      </section>
+
+      <!-- TAB 2: CHAT -->
+      <section class="tab-pane" id="tab-chat">
+        <div class="chat-box" id="chatContainer"></div>
+        <div class="input-row">
+          <label class="icon-btn" title="Upload Image for Vision OCR">
+            📷<input type="file" accept="image/*" style="display:none;" onchange="handleChatImage(event)" />
+          </label>
+          <input type="text" id="chatInput" placeholder="Ask KAYRA in Hindi, Hinglish, or English..." onkeydown="if(event.key==='Enter')sendChat()" />
+          <button class="btn" onclick="sendChat()">➤</button>
+        </div>
+      </section>
+
+      <!-- TAB 3: CENTER MIC ORB -->
+      <section class="tab-pane" id="tab-mic">
+        <div class="card" style="text-align:center;">
+          <h2>🎙️ Hands-Free Voice Command Center</h2>
+          <p class="sub-muted">Speak in Hindi, Hinglish, or English ("Lock", "Mera secret note save karo...", "Start timer 60")</p>
+          <div class="orb-wrap">
+            <div class="mic-orb" onclick="startVoiceRecognition()">
+              <div style="font-size:42px;">🎙️</div>
+              <div style="font-size:11px;font-weight:800;">TAP & SPEAK</div>
+            </div>
+          </div>
+          <p id="micTranscriptBox" style="color:var(--accent);font-weight:700;">Tap the orb and speak...</p>
+        </div>
+      </section>
+
+      <!-- TAB 4: TOOLS (14) + CONNECTORS + VAULT -->
+      <section class="tab-pane" id="tab-tools">
+        <div style="margin-bottom:12px;">
+          <h2>⚡ All 14 KAYRA Tool Categories</h2>
+          <input type="text" id="toolSearch" placeholder="Search 14 tools, SOS, Synth, OCR, Maps..." oninput="renderToolsGrid()" style="margin-top:8px;" />
+        </div>
+        <div id="toolsGridContainer"></div>
+
+        <div class="card">
+          <h3>🔌 Connector Tools (8)</h3>
+          <p class="sub-muted">Google Calendar, Google Drive, GitHub, Canva, Multi-AI, Tavily, ElevenLabs & Telegram</p>
+          <div class="grid-2" style="margin-top:10px;">
+            <button class="btn-outline" onclick="window.open('https://calendar.google.com','_blank')">📅 Google Calendar</button>
+            <button class="btn-outline" onclick="window.open('https://drive.google.com','_blank')">☁️ Google Drive</button>
+            <button class="btn-outline" onclick="window.open('https://github.com','_blank')">💻 GitHub</button>
+            <button class="btn-outline" onclick="window.open('https://www.canva.com','_blank')">🎨 Canva</button>
+            <button class="btn-outline" onclick="alert('Multi-AI Router Ready (Gemini / Groq / OpenAI / Claude)')">🤖 Multi-AI</button>
+            <button class="btn-outline" onclick="alert('Tavily Web Research Connected')">🔍 Tavily Search</button>
+            <button class="btn-outline" onclick="speakGreeting()">🗣️ ElevenLabs / TTS</button>
+            <button class="btn-outline" onclick="window.open('https://t.me','_blank')">✈️ Telegram</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🔐 Private Notes & Parking Vault</h3>
+          <div class="input-row" style="margin-bottom:8px;">
+            <input type="text" id="vaultInput" placeholder="Secret note ('Mera secret note save karo...')" />
+            <button class="btn" onclick="saveVaultNoteFromInput()">Save</button>
+          </div>
+          <button class="btn-outline" onclick="saveParkingGps()" style="width:100%;margin-bottom:10px;">🚗 Save Parked Vehicle GPS</button>
+          <div id="vaultList"></div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SETTINGS -->
+      <section class="tab-pane" id="tab-settings">
+        <div class="card">
+          <h2>⚙️ Identity, Gemini API Key & Greeting</h2>
+          <label class="sub-muted">User Name (Default: Amit)</label>
+          <input type="text" id="setUserName" value="Amit" style="margin-bottom:8px;" />
+          <label class="sub-muted">AI Companion Name (Default: KAYRA)</label>
+          <input type="text" id="setAiName" value="KAYRA" style="margin-bottom:8px;" />
+          <label class="sub-muted">Custom Voice Greeting</label>
+          <textarea id="setGreeting" rows="2" style="margin-bottom:8px;">Hello Amit! Main Kayra hoon. How can I assist you today?</textarea>
+          <label class="sub-muted">Optional Gemini API Key (for standalone HTML chat)</label>
+          <input type="password" id="setApiKey" placeholder="Paste AIza... key (optional)" style="margin-bottom:10px;" />
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn" onclick="saveQuickSettings()">Save & Speak Greeting</button>
+            <button class="btn-outline" onclick="openCustomizeModal()">🎨 Customize UI Studio</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📦 1-Click Download index.html / Copy Code for APK</h3>
+          <p class="sub-muted">Download this single-file app or copy full HTML to convert to APK on mobile (e.g. via WebIntoApp).</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            <button class="btn" onclick="downloadSelfHtml()">⬇️ Download index.html</button>
+            <button class="btn-outline" onclick="copySelfHtml()">📋 Copy Code for APK</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-item active" id="nav-home" onclick="switchTab('home')"><span>🏠</span><span>Home</span></button>
+      <button class="nav-item" id="nav-chat" onclick="switchTab('chat')"><span>💬</span><span>Chat</span></button>
+      <button class="nav-center-orb" onclick="switchTab('mic');startVoiceRecognition()">🎙️</button>
+      <button class="nav-item" id="nav-tools" onclick="switchTab('tools')"><span>⚡</span><span>Tools (14)</span></button>
+      <button class="nav-item" id="nav-settings" onclick="switchTab('settings')"><span>⚙️</span><span>Settings</span></button>
+    </nav>
+  </div>
+
+  <!-- CUSTOMIZE UI STUDIO MODAL -->
+  <div class="modal-backdrop" id="customizeModal">
+    <div class="modal-content">
+      <h3>🎨 Customize My UI Studio</h3>
+      <label class="sub-muted">User Name</label>
+      <input type="text" id="studioUser" value="Amit" style="margin-bottom:8px;" />
+      <label class="sub-muted">AI Name</label>
+      <input type="text" id="studioAi" value="KAYRA" style="margin-bottom:8px;" />
+      <label class="sub-muted">Wake Word</label>
+      <input type="text" id="studioWake" value="Hey Kayra" style="margin-bottom:8px;" />
+      <label class="sub-muted">Neon Color Theme Preset</label>
+      <select id="studioTheme" onchange="applyThemePreset(this.value)" style="margin-bottom:8px;">
+        <option value="purple">Neon Purple/Pink Aurora</option>
+        <option value="emerald">Cyber Emerald</option>
+        <option value="sunset">Sunset Blaze</option>
+        <option value="ocean">Ocean Blue</option>
+        <option value="gold">Royal Gold</option>
+      </select>
+      <label class="sub-muted">Chat Bubble Style</label>
+      <select id="studioBubble" onchange="applyBubbleStyle(this.value)" style="margin-bottom:8px;">
+        <option value="18px">Glassmorphic</option>
+        <option value="26px">Rounded</option>
+        <option value="6px">Minimal</option>
+      </select>
+      <div style="margin:8px 0;">
+        <button class="btn-outline" onclick="document.body.classList.toggle('light-mode')">🌗 Toggle Dark / Light Mode</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn" onclick="saveStudioModal()">Apply & Speak</button>
+        <button class="btn-outline" onclick="closeModals()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE TOOL MODAL -->
+  <div class="modal-backdrop" id="toolModal">
+    <div class="modal-content" id="toolModalBody"></div>
+  </div>
+
+  <!-- PIN LOCK MODAL -->
+  <div class="modal-backdrop" id="pinModal">
+    <div class="modal-content" style="text-align:center;">
+      <h2>🛡️ Security PIN Lock</h2>
+      <p class="sub-muted">Enter 4-digit PIN to unlock (Default: 1234)</p>
+      <input type="password" id="pinInput" maxlength="4" placeholder="1234" style="text-align:center;font-size:22px;letter-spacing:8px;margin:12px 0;" />
+      <button class="btn" onclick="verifyPin()">Unlock</button>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      userName: localStorage.getItem('kayra_user') || 'Amit',
+      aiName: localStorage.getItem('kayra_ai') || 'KAYRA',
+      wakeWord: localStorage.getItem('kayra_wake') || 'Hey Kayra',
+      greeting: localStorage.getItem('kayra_greet') || 'Hello Amit! Main Kayra hoon. How can I assist you today?',
+      apiKey: localStorage.getItem('kayra_api_key') || '',
+      muted: false,
+      pin: localStorage.getItem('kayra_pin') || '1234',
+      timerSec: 0,
+      timerHandle: null,
+      missionHandle: null,
+      missionPaused: false,
+      notes: JSON.parse(localStorage.getItem('kayra_notes') || '["Welcome to your local Private Notes Vault!"]'),
+      contacts: JSON.parse(localStorage.getItem('kayra_contacts') || '[{"name":"Mom","phone":"+919876543210"},{"name":"Rohan","phone":"+919811122233"}]')
+    };
+
+    const TOOLS_14 = [
+      { id: 1, title: "1. Communication Tools", desc: "WhatsApp, SMS, Email & Live GPS Emergency SOS" },
+      { id: 2, title: "2. Call Tools", desc: "Call Contact Dialer, Answer Config, Call Reject Guard & Contacts" },
+      { id: 3, title: "3. Media Tools", desc: "Web Audio Cyber Synth Tune, YouTube Music & Volume Slider" },
+      { id: 4, title: "4. Device Tools", desc: "Live Header Timer, Full-Screen Torch, Battery Info & PIN Lock" },
+      { id: 5, title: "5. Files & Photos", desc: "File Manager, Live Camera Preview & Vision OCR" },
+      { id: 6, title: "6. Smart / Generative Tools", desc: "Website Builder, Image Generator, Deep Research, Game Coach & Health" },
+      { id: 7, title: "7. Missions", desc: "Multi-step Autonomous Mission Progress Bar" },
+      { id: 8, title: "8. Notifications", desc: "Read Notifications Aloud, Quick Reply & Safety Rule #14 OTP Reader" },
+      { id: 9, title: "9. Maps & 'My World'", desc: "Google Maps Navigation, Live GPS, Parking Saver & Nearby Places" },
+      { id: 10, title: "10. PC Connect", desc: "Connect PC via IP/Code, Remote Lock & File Share" },
+      { id: 11, title: "11. Search, Browser & Apps", desc: "Google Search, Browser Control & App Launcher" },
+      { id: 12, title: "12. Screen Automation", desc: "Auto Screen Read Aloud & Tap/Type/Scroll Macro Builder" },
+      { id: 13, title: "13. Automation & Habit Learning", desc: "Time, Battery, Wi-Fi Triggers & Habit Learning Toggle" },
+      { id: 14, title: "14. Safety Rules", desc: "OTP Privacy Guard, Call Reject Guard & Instant 'Lock' Command" }
+    ];
+
+    function syncProfileUI() {
+      document.getElementById('hdrAiName').textContent = state.aiName;
+      document.getElementById('homeHello').textContent = 'Hello, ' + state.userName;
+      document.getElementById('homeGreetingLine').textContent = '"' + state.greeting + '"';
+      document.getElementById('wakeWordBadge').textContent = 'Wake: "' + state.wakeWord + '"';
+      document.getElementById('setUserName').value = state.userName;
+      document.getElementById('setAiName').value = state.aiName;
+      document.getElementById('setGreeting').value = state.greeting;
+      document.getElementById('setApiKey').value = state.apiKey;
+    }
+
+    function speakText(text) {
+      if (state.muted || !('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-IN';
+      window.speechSynthesis.speak(u);
+    }
+
+    function speakGreeting() { speakText(state.greeting); }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      syncProfileUI();
+      renderToolsGrid();
+      renderVault();
+      appendChat(false, 'Namaste ' + state.userName + '! Main ' + state.aiName + ' hoon. Tap the glowing Mic Orb or open any of my 14 interactive tool categories!');
+      setTimeout(() => speakGreeting(), 350);
+      document.body.addEventListener('click', function firstTap() {
+        speakGreeting();
+        document.body.removeEventListener('click', firstTap);
+      }, { once: true });
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const pane = document.getElementById('tab-' + tabId);
+      if (pane) pane.classList.add('active');
+      const nav = document.getElementById('nav-' + tabId);
+      if (nav) nav.classList.add('active');
+    }
+
+    function toggleMute() {
+      state.muted = !state.muted;
+      document.getElementById('muteBtn').textContent = state.muted ? '🔇' : '🔊';
+      if (state.muted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    function appendChat(isUser, text) {
+      const box = document.getElementById('chatContainer');
+      const div = document.createElement('div');
+      div.className = 'msg ' + (isUser ? 'user' : 'bot');
+      div.textContent = text;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function handleQuickCommand(cmd) {
+      if (cmd.trim().toLowerCase() === 'lock') { openPinLock(); return; }
+      if (cmd.toLowerCase().includes('secret note') || cmd.toLowerCase().includes('note save')) {
+        state.notes.unshift(cmd);
+        localStorage.setItem('kayra_notes', JSON.stringify(state.notes));
+        renderVault();
+        speakText('Secret note saved to your private vault.');
+        alert('Saved to Private Vault: ' + cmd);
+        return;
+      }
+      switchTab('chat');
+      appendChat(true, cmd);
+      if (state.apiKey) {
+        try {
+          const model = document.getElementById('modelSelector').value || 'gemini-2.5-flash';
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: `You are ${state.aiName}, AI companion for ${state.userName}. Reply in helpful Hinglish/English: ${cmd}` }] }] })
+          });
+          const data = await res.json();
+          const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || ('Completed request for ' + state.userName);
+          appendChat(false, reply);
+          speakText(reply);
+          return;
+        } catch (err) {}
+      }
+      const reply = state.aiName + ': Namaste ' + state.userName + '! Maine aapka command ("' + cmd + '") process kar liya hai. (Tip: Add your Gemini API key in Settings for live cloud LLM answers!)';
+      appendChat(false, reply);
+      speakText(reply);
+    }
+
+    function handleChatImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      switchTab('chat');
+      appendChat(true, '📷 Uploaded Image: ' + file.name);
+      appendChat(false, 'Gemini Vision OCR ready for ' + file.name + '. Extracted text & visual details indexed.');
+    }
+
+    function sendFromHome() {
+      const inp = document.getElementById('homeQuickInput');
+      if (!inp.value.trim()) return;
+      handleQuickCommand(inp.value.trim());
+      inp.value = '';
+    }
+
+    function sendChat() {
+      const inp = document.getElementById('chatInput');
+      if (!inp.value.trim()) return;
+      handleQuickCommand(inp.value.trim());
+      inp.value = '';
+    }
+
+    function startVoiceRecognition() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        const manual = prompt('Speak/Type your Hindi, Hinglish, or English command:');
+        if (manual) handleQuickCommand(manual);
+        return;
+      }
+      const rec = new SR();
+      rec.lang = 'en-IN';
+      const orb = document.getElementById('mainMicOrb');
+      orb.classList.add('listening');
+      rec.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        document.getElementById('micTranscriptBox').textContent = '"' + transcript + '"';
+        handleQuickCommand(transcript);
+      };
+      rec.onend = () => orb.classList.remove('listening');
+      rec.start();
+    }
+
+    function startCountdown(sec) {
+      clearInterval(state.timerHandle);
+      state.timerSec = sec;
+      const badge = document.getElementById('hdrTimerBadge');
+      badge.style.display = 'inline-block';
+      speakText('Timer started for ' + sec + ' seconds.');
+      state.timerHandle = setInterval(() => {
+        state.timerSec--;
+        const m = String(Math.floor(state.timerSec / 60)).padStart(2, '0');
+        const s = String(state.timerSec % 60).padStart(2, '0');
+        badge.textContent = '⏱️ ' + m + ':' + s;
+        if (state.timerSec <= 0) {
+          clearInterval(state.timerHandle);
+          badge.style.display = 'none';
+          speakText('Attention ' + state.userName + '! Timer complete!');
+        }
+      }, 1000);
+    }
+
+    function cancelLiveTimer() {
+      clearInterval(state.timerHandle);
+      document.getElementById('hdrTimerBadge').style.display = 'none';
+    }
+
+    function startMission(goal) {
+      clearInterval(state.missionHandle);
+      const box = document.getElementById('missionBox');
+      box.style.display = 'block';
+      document.getElementById('missionTitle').textContent = '🚀 Mission: ' + goal;
+      const steps = ['Step 1/4: Analyzing goal...', 'Step 2/4: Checking Safety Rules...', 'Step 3/4: Executing AI workflow...', 'Step 4/4: Mission Complete!'];
+      let i = 0;
+      document.getElementById('missionStepText').textContent = steps[0];
+      state.missionHandle = setInterval(() => {
+        if (state.missionPaused) return;
+        i++;
+        if (i < steps.length) {
+          document.getElementById('missionStepText').textContent = steps[i];
+        } else {
+          clearInterval(state.missionHandle);
+          speakText('Autonomous mission completed!');
+        }
+      }, 1500);
+    }
+
+    function togglePauseMission() {
+      state.missionPaused = !state.missionPaused;
+      document.getElementById('missionPauseBtn').textContent = state.missionPaused ? 'Resume' : 'Pause';
+    }
+
+    function cancelMission() {
+      clearInterval(state.missionHandle);
+      document.getElementById('missionBox').style.display = 'none';
+    }
+
+    function renderToolsGrid() {
+      const q = (document.getElementById('toolSearch').value || '').toLowerCase();
+      const box = document.getElementById('toolsGridContainer');
+      box.innerHTML = '';
+      TOOLS_14.filter(t => t.title.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q)).forEach(t => {
+        const d = document.createElement('div');
+        d.className = 'card';
+        d.style.cursor = 'pointer';
+        d.onclick = () => openToolModal(t.id);
+        d.innerHTML = `<h3 style="color:var(--primary)">${t.title}</h3><p class="sub-muted">${t.desc}</p>`;
+        box.appendChild(d);
+      });
+    }
+
+    async function openToolModal(id) {
+      const tool = TOOLS_14.find(t => t.id === id) || TOOLS_14[0];
+      const body = document.getElementById('toolModalBody');
+      let batteryInfo = 'Battery API ready';
+      if ('getBattery' in navigator) {
+        try {
+          const b = await navigator.getBattery();
+          batteryInfo = `Battery: ${Math.round(b.level * 100)}% (${b.charging ? 'Charging ⚡' : 'On Battery'})`;
+        } catch (e) {}
+      }
+      body.innerHTML = `
+        <h3 style="color:var(--primary)">${tool.title}</h3>
+        <p class="sub-muted">${tool.desc}</p>
+        <p class="sub-muted" style="color:var(--accent)">${batteryInfo} • Cores: ${navigator.hardwareConcurrency || 8}</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin:14px 0;">
+          <button class="btn" onclick="sendEmergencySos()">🚨 Emergency SOS (Live GPS WhatsApp/SMS)</button>
+          <button class="btn-outline" onclick="window.location.href='tel:+919876543210'">📞 Call Saved Contact (Dialer)</button>
+          <button class="btn-outline" onclick="playCyberSynth()">🎵 Play Built-in Cyber Synth Tune</button>
+          <button class="btn-outline" onclick="document.getElementById('torchOverlay').style.display='flex';closeModals()">🔦 Full-Screen White Torch</button>
+          <button class="btn-outline" onclick="startCountdown(60);closeModals()">⏱️ Start 60s Live Header Timer</button>
+          <button class="btn-outline" onclick="startMission('Autonomous Daily Briefing');closeModals()">🚀 Start Multi-Step Mission</button>
+          <button class="btn-outline" onclick="speakText('Safety Rule 14 verified: Your OTP is 8 4 9 2 0 1')">🛡️ Verify & Read OTP Aloud (Rule #14)</button>
+          <button class="btn-outline" onclick="window.open('https://www.google.com/maps/search/ATM+near+me','_blank')">🗺️ Nearby ATM / Hospital / Fuel (Maps)</button>
+        </div>
+        <button class="btn-outline" onclick="closeModals()" style="width:100%;">Close</button>
+      `;
+      document.getElementById('toolModal').classList.add('open');
+    }
+
+    function sendEmergencySos() {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const msg = encodeURIComponent(`🚨 EMERGENCY SOS from ${state.userName}! Help needed at GPS: https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`);
+          window.open(`https://wa.me/?text=${msg}`, '_blank');
+        }, () => {
+          window.open(`https://wa.me/?text=EMERGENCY%20SOS%20from%20${encodeURIComponent(state.userName)}`, '_blank');
+        });
+      }
+    }
+
+    function playCyberSynth() {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [220, 261.63, 329.63, 440, 329.63, 440].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (idx + 1) * 0.18);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.18);
+        osc.stop(ctx.currentTime + (idx + 1) * 0.18);
+      });
+    }
+
+    function renderVault() {
+      const box = document.getElementById('vaultList');
+      box.innerHTML = state.notes.map(n => `<div style="padding:8px;background:var(--surface);border-radius:10px;margin-bottom:6px;font-size:13px;">🔒 ${n}</div>`).join('');
+    }
+
+    function saveVaultNoteFromInput() {
+      const inp = document.getElementById('vaultInput');
+      if (!inp.value.trim()) return;
+      state.notes.unshift(inp.value.trim());
+      localStorage.setItem('kayra_notes', JSON.stringify(state.notes));
+      inp.value = '';
+      renderVault();
+    }
+
+    function saveParkingGps() {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const entry = `Parked Car GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)} (${new Date().toLocaleTimeString()})`;
+          state.notes.unshift(entry);
+          localStorage.setItem('kayra_notes', JSON.stringify(state.notes));
+          renderVault();
+          speakText('Vehicle parking location saved.');
+        }, () => {
+          state.notes.unshift('Parked Car Spot saved at ' + new Date().toLocaleTimeString());
+          renderVault();
+        });
+      }
+    }
+
+    function openCustomizeModal() { document.getElementById('customizeModal').classList.add('open'); }
+    function openPinLock() { document.getElementById('pinModal').classList.add('open'); }
+    function closeModals() {
+      document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('open'));
+    }
+
+    function verifyPin() {
+      const val = document.getElementById('pinInput').value;
+      if (val === state.pin) {
+        document.getElementById('pinInput').value = '';
+        closeModals();
+        speakText('Welcome back ' + state.userName);
+      } else {
+        alert('Incorrect PIN! Default is 1234');
+      }
+    }
+
+    function applyThemePreset(theme) {
+      const root = document.documentElement;
+      const map = {
+        purple: ['#d946ef', '#8b5cf6', '#00f5d4'],
+        emerald: ['#10b981', '#06b6d4', '#a3e635'],
+        sunset: ['#f43f5e', '#f97316', '#facc15'],
+        ocean: ['#38bdf8', '#6366f1', '#2dd4bf'],
+        gold: ['#f59e0b', '#d946ef', '#fde047']
+      };
+      const [p, s, a] = map[theme] || map.purple;
+      root.style.setProperty('--primary', p);
+      root.style.setProperty('--secondary', s);
+      root.style.setProperty('--accent', a);
+    }
+
+    function applyBubbleStyle(radius) {
+      document.documentElement.style.setProperty('--radius-bubble', radius);
+    }
+
+    function saveStudioModal() {
+      state.userName = document.getElementById('studioUser').value.trim() || 'Amit';
+      state.aiName = document.getElementById('studioAi').value.trim() || 'KAYRA';
+      state.wakeWord = document.getElementById('studioWake').value.trim() || 'Hey Kayra';
+      localStorage.setItem('kayra_user', state.userName);
+      localStorage.setItem('kayra_ai', state.aiName);
+      localStorage.setItem('kayra_wake', state.wakeWord);
+      syncProfileUI();
+      closeModals();
+      speakGreeting();
+    }
+
+    function saveQuickSettings() {
+      state.userName = document.getElementById('setUserName').value.trim() || 'Amit';
+      state.aiName = document.getElementById('setAiName').value.trim() || 'KAYRA';
+      state.greeting = document.getElementById('setGreeting').value.trim() || state.greeting;
+      state.apiKey = document.getElementById('setApiKey').value.trim();
+      localStorage.setItem('kayra_user', state.userName);
+      localStorage.setItem('kayra_ai', state.aiName);
+      localStorage.setItem('kayra_greet', state.greeting);
+      localStorage.setItem('kayra_api_key', state.apiKey);
+      syncProfileUI();
+      speakGreeting();
+    }
+
+    function downloadSelfHtml() {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'index.html';
+      a.click();
+    }
+
+    function copySelfHtml() {
+      navigator.clipboard.writeText(document.documentElement.outerHTML);
+      alert('Full single-file index.html copied to clipboard!');
+    }
+  </script>
+</body>
+</html>

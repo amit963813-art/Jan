@@ -1,0 +1,6 @@
+{
+  "name": "Kayra AI Assistant",
+  "description": "Futuristic cyberpunk AI companion powered by Gemini with voice assistant, 14 interactive tool categories, UI customization studio, and privacy vault.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
