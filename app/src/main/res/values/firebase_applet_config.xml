@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <resources>
     <string name="recaptcha_site_key" translatable="false">6LebJgMuAAAAAGfDVAakFH8DNh13OwU36mCGY9nr</string>
+    <string name="fb_fallback_app_id" translatable="false">1:913273150621:android:db16147d0c4b4a26298874</string>
+    <string name="fb_fallback_api_key" translatable="false">AIzaSyCTwP7kYRuGCyyQCTmwDHRGeGQB6nh_M2c</string>
+    <string name="fb_fallback_project_id" translatable="false">gen-lang-client-0505500826</string>
+    <string name="fb_fallback_sender_id" translatable="false">913273150621</string>
+    <string name="fb_fallback_storage_bucket" translatable="false">gen-lang-client-0505500826.firebasestorage.app</string>
 </resources>

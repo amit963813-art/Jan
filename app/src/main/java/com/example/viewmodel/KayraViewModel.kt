@@ -57,6 +57,10 @@ sealed interface ToolAiOutputState {
 
 class KayraViewModel(application: Application) : AndroidViewModel(application) {
 
+    init {
+        com.example.ensureFirebaseInitialized(application)
+    }
+
     private val prefs = application.getSharedPreferences("kayra_companion_prefs", Context.MODE_PRIVATE)
     private var hasAutoGreeted = false
 
@@ -69,15 +73,19 @@ class KayraViewModel(application: Application) : AndroidViewModel(application) {
 
     // Lazy Firebase AI Logic models per skill guidelines
     private val flashModel: GenerativeModel by lazy {
+        com.example.ensureFirebaseInitialized(getApplication())
         Firebase.ai.generativeModel("gemini-3.8-flash")
     }
     private val proModel: GenerativeModel by lazy {
+        com.example.ensureFirebaseInitialized(getApplication())
         Firebase.ai.generativeModel("gemini-4-argon")
     }
     private val liteModel: GenerativeModel by lazy {
+        com.example.ensureFirebaseInitialized(getApplication())
         Firebase.ai.generativeModel("gemini-3.5-flash-lite")
     }
     private val imageGenModel: GenerativeModel by lazy {
+        com.example.ensureFirebaseInitialized(getApplication())
         Firebase.ai.generativeModel(
             modelName = "gemini-nano-banana-2.1",
             generationConfig = generationConfig {
